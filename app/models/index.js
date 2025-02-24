@@ -1,0 +1,32 @@
+const { sequelize } = require("../config/config");
+
+const { ROLES, User } = require('../models/userModel');
+const { STATUS, Setup } = require('../models/setupModel');
+const { Smtps } = require("../models/smtpModel");
+const { Templates,
+  VISIBILITY,
+  TEMPLATE_TYPE, } = require("./templateModel");
+const { Tools } = require("./toolModel");
+const { Schedules } = require("./scheduleModel");
+const { LoginHistory } = require("./loginHistoryModel");
+
+
+
+
+sequelize.sync({ force: false }).then(() => {
+  console.log('Database đã được đồng bộ!');
+});
+
+module.exports = {
+  User,
+  ROLES,
+  STATUS,
+  Setup,
+  Smtps,
+  Templates,
+  VISIBILITY,
+  TEMPLATE_TYPE,
+  Tools,
+  Schedules,
+  LoginHistory
+};
