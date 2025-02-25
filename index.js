@@ -21,13 +21,15 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 const { authRoutes, 
     userRoutes,
     setupRoutes,
-    smtpRoutes
+    smtpRoutes,
+    scheduleRoutes
  } = require('./app/routes');
 const { Mailer } = require('./app/nodemailer')
 app.use('/api/auth', authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", setupRoutes);
 app.use("/api", smtpRoutes);
+app.use("/api", scheduleRoutes);
 
 
 const mailer = new Mailer()

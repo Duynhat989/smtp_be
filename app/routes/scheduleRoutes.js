@@ -1,0 +1,13 @@
+const express = require("express");
+const scheduleController = require("../controllers/scheduleController.js");
+const auth = require('../middlewares/authMiddleware.js');
+const { validate } = require('../middlewares/validation.js');
+const router = express.Router();
+
+
+router.get("/schedules", auth([1, 3]), scheduleController.list);
+router.post("/schedule/create", auth([1, 3]), validate(['name','description', 'startDate', 'endDate']), scheduleController.create);
+// router.put("/smtps/:id", auth([1, 3]), scheduleController.updateSmtp);
+// router.delete("/smtps/:id", auth([1, 3]), scheduleController.deleteSmtp);
+
+module.exports = router;
