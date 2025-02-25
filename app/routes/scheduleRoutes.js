@@ -8,6 +8,6 @@ const router = express.Router();
 router.get("/schedules", auth([1, 3]), scheduleController.list);
 router.post("/schedule/create", auth([1, 3]), validate(['name','description', 'startDate', 'endDate']), scheduleController.create);
 // router.put("/smtps/:id", auth([1, 3]), scheduleController.updateSmtp);
-// router.delete("/smtps/:id", auth([1, 3]), scheduleController.deleteSmtp);
+router.delete("/schedule/:id", auth([1, 3]), scheduleController.destroyed);
 
 module.exports = router;

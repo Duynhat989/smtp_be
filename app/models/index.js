@@ -8,6 +8,7 @@ const { Templates,
   TEMPLATE_TYPE, } = require("./templateModel");
 const { Tools } = require("./toolModel");
 const { Schedules } = require("./scheduleModel");
+const { Emails } = require("./emailModel");
 const { LoginHistory } = require("./loginHistoryModel");
 
 
@@ -28,5 +29,6 @@ module.exports = {
   TEMPLATE_TYPE,
   Tools,
   Schedules,
-  LoginHistory
+  LoginHistory,
+  Emails
 };
