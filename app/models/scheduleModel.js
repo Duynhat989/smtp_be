@@ -16,8 +16,24 @@ const Schedules = sequelize.define("Schedules", {
       len: [3, 100], // Tên chiến dịch phải có độ dài từ 3 đến 100 ký tự
     },
   },
-  description: {
-    type: DataTypes.TEXT, // Mô tả chi tiết chiến dịch
+  timezone: {
+    type: DataTypes.STRING, // Mô tả chi tiết chiến dịch
+    allowNull: true,
+  },
+  html: {
+    type: DataTypes.TEXT("long"), // Nội dung email
+    allowNull: false,
+  },
+  business: {
+    type: DataTypes.TEXT, // Tên hiển thị khi gửi mail
+    allowNull: true,
+  },
+  subject: {
+    type: DataTypes.TEXT, // Nội dung email
+    allowNull: true,
+  },
+  telegramBot: {
+    type: DataTypes.TEXT, // Mô tả công cụ
     allowNull: true,
   },
   startDate: {

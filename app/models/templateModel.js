@@ -29,14 +29,6 @@ const Templates = sequelize.define("Templates", {
       len: [3, 100], // Đảm bảo tên có độ dài từ 3 đến 100 ký tự
     },
   },
-  slug: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true, // Slug phải là duy nhất
-    validate: {
-      is: /^[a-z0-9]+(?:-[a-z0-9]+)*$/i, // Định dạng slug (chỉ chữ cái, số, và dấu gạch ngang)
-    },
-  },
   avatar: {
     type: DataTypes.STRING, // Lưu URL của hình đại diện
     allowNull: true,

@@ -17,7 +17,8 @@ const { LoginHistory } = require("./loginHistoryModel");
 sequelize.sync({ force: false }).then(() => {
   console.log('Database đã được đồng bộ!');
 });
-
+Schedules.hasMany(Emails, { foreignKey: "scheId", as: "emails" });
+Emails.belongsTo(Schedules, { foreignKey: "scheId", as: "schedule" });
 module.exports = {
   User,
   ROLES,

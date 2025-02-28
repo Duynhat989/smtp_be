@@ -15,21 +15,26 @@ const server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // Khái báo đăng ký routes
-const { authRoutes, 
+const { authRoutes,
     userRoutes,
     setupRoutes,
     smtpRoutes,
     scheduleRoutes
- } = require('./app/routes');
+} = require('./app/routes');
 const { Mailer } = require('./app/nodemailer')
 app.use('/api/auth', authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", setupRoutes);
 app.use("/api", smtpRoutes);
 app.use("/api", scheduleRoutes);
+
+const { processSmtp } = require('./progress/index')
+processSmtp()
+
+
 
 
 const mailer = new Mailer()

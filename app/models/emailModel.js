@@ -27,10 +27,6 @@ const Emails = sequelize.define("Emails", {
       isEmail: true,
     },
   },
-  html: {
-    type: DataTypes.TEXT("long"), // Nội dung email
-    allowNull: false,
-  },
   config: {
     type: DataTypes.JSON, // Cấu hình SMTP hoặc gửi email
     allowNull: false,

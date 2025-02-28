@@ -1,54 +1,38 @@
+const { Sequelize } = require('sequelize')
 const { STATUS, loadApiKey, Schedules, Emails } = require("../models");
 
 // Lấy danh sách tất cả học sinh
 exports.create = async (req, res) => {
     // Lấy khóa api
     try {
-        const { name, description, startDate, endDate, emailList, html } = req.body
+        const { name, timezone, telegramBot, startDate, endDate, emailLst, templateHTML,business,subject } = req.body
         const userId = req.user.id
         let result = await Schedules.create({
             name,
-            description,
-            startDate, endDate,
-            ownerId: userId
+            timezone,
+            telegramBot,
+            startDate,
+            endDate,
+            html:templateHTML,
+            ownerId: userId,
+            business,
+            subject
         })
         // Bổ sung thêm email cho dự án sau 
         // Trạng thái xử lý 
         // xử lý xog mới cho hoàn thành
-        const proccessEmail = async () => {
-            for (let index = 0; index < emailList.length; index++) {
-                const dataEmail = emailList[index];
+        const proccessEmail = async (emails) => {
+            for (let index = 0; index < emails.length; index++) {
+                const dataEmail = emails[index];
                 // Thêm email vào model
-                // cấu trúc mô phòng cho email
-                // let dataMail = {
-                //     email: "vietduy989kc@gmail.com",
-                //     keywords: [{
-                //         name: "{{name}}",
-                //         value: "Dinh Viet Duy"
-                //     }, {
-                //         name: "{{id_order}}",
-                //         value: "235645526346436"
-                //     }]
-                // }
-                let newInbox = async (email, keywords) => {
-                    let htmlBase = html
-                    // Thay đổi nội dung theo keyword
-                    // Gắn thêm id theo dõi nội dung
-                    // Thêm trình random class tránh quét nội dung
-                    
-
-
-
-
-                }
                 Emails.create({
                     scheId: result.id,
                     email: dataEmail.email,
-                    html: await newInbox(dataEmail.email, dataEmail.keywords)
+                    config:dataEmail
                 })
             }
         }
-        proccessEmail()
+        proccessEmail(emailLst)
         res.status(200).json({
             success: true,
             data: result,
@@ -67,23 +51,45 @@ exports.list = async (req, res) => {
     const { limit = 10, page = 1, status = 0 } = req.query
     const offset = limit * (page - 1)
     const userId = req.user.id
-    try {
-
-        let ifSql = { ownerId: userId }
+    let ifSql = { ownerId: userId }
+    ifSql = {
+        ...ifSql
+    }
+    if(status != 0){
         ifSql = {
             ...ifSql,
-            status: status == 0 ? null : status
+            status: status
         }
-        let result = await Schedules.findAll({
-            where: ifSql,
-            order: [["createdAt", "DESC"]],
-            offset: offset,
-            limit: limit
-        })
-        res.status(200).json({
-            success: true,
-            data: result
-        }); // Gửi ID tệp về client
+    }
+    console.log(ifSql)
+    let result = await Schedules.findAll({
+        where: ifSql,
+        order: [["createdAt", "DESC"]],
+        offset: offset,
+        limit: limit,
+        subQuery: false, // ✅ Tránh subquery sai
+        include: [
+            {
+                model: Emails,
+                as: "emails",
+                attributes: [
+                    [Sequelize.fn("COUNT", Sequelize.col("emails.id")), "emailCount"], // Tổng số email
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 2 THEN 1 END`)), "send"] // Số email đã gửi
+                ],
+                required: false // 🟡 Tránh mất Schedules không có email nào
+            }
+        ],
+        group: ["Schedules.id"] // ✅ Nhóm theo ID
+    });
+    
+    
+    res.status(200).json({
+        success: true,
+        data: result
+    }); // Gửi ID tệp về client
+    try {
+
+       
     } catch (error) {
         res.status(500).json({
             success: false,

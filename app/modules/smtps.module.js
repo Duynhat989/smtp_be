@@ -52,14 +52,13 @@ class EmailSender {
         }
     }
 
-    async sendEmail({ to, subject, text, html }) {
+    async sendEmail({ to, subject, html,from }) {
         try {
             // Thêm các headers theo dõi
             const mailOptions = {
-                from: this.email,
+                from: `"${from}" ${this.email}`, 
                 to,
                 subject,
-                text,
                 html,
                 // DSN (Delivery Status Notification) options
                 dsn: {
@@ -74,10 +73,10 @@ class EmailSender {
                     'List-Unsubscribe': `<mailto:${this.email}?subject=unsubscribe>`
                 }
             };
-
+    
             const result = await this.transporter.sendMail(mailOptions);
             console.log('Email sent:', result);
-            
+    
             // Phân tích kết quả gửi
             const deliveryStatus = {
                 messageId: result.messageId,
@@ -86,7 +85,7 @@ class EmailSender {
                 pending: result.pending,
                 response: result.response
             };
-
+    
             return {
                 ...result,
                 deliveryStatus,
@@ -97,6 +96,7 @@ class EmailSender {
             throw error;
         }
     }
+    
 
     // Phương thức để kiểm tra trạng thái email
     async checkEmailStatus(messageId) {
