@@ -43,6 +43,8 @@ const senderEmail = async (order, customer) => {
                 { where: { id: customer.id } }
             );
         }
+    } else {
+
     }
 };
 const OrderManeger = new Set(); // Dùng Set để tối ưu kiểm tra
@@ -81,71 +83,48 @@ const getIdOrder = async () => {
 
     return null;
 };
-
-const processSmtpWorker = async () => {
+const processSmtpWorker = async (thead) => {
     while (true) {
-        console.log(OrderManeger)
-        let order = await getIdOrder()
-        // 
+        console.log(`Worker: ${thead}`, OrderManeger);
+        let order = await getIdOrder();
         if (order) {
             while (true) {
                 let emails = await Emails.findAll({
-                    where: {
-                        status: 1
-                    },
-                    limit: 10
-                })
-                if (emails.length == 0) {
-                    // Het dừng
-                    await Schedules.update(
-                        { status: 3 },
-                        { where: { id: order.id } }
+                    where: { status: 1 },
+                    limit: 20 // Tăng limit để chia nhóm
+                });
+
+                if (emails.length === 0) {
+                    // Hết danh sách email, cập nhật trạng thái schedule
+                    await Schedules.update({ status: 3 }, { where: { id: order.id } });
+                    break;
+                }
+
+                const batchSize = 10; // Số email gửi đồng thời
+                for (let i = 0; i < emails.length; i += batchSize) {
+                    let batch = emails.slice(i, i + batchSize);
+
+                    // Gửi email song song trong nhóm bằng Promise.all()
+                    await Promise.all(
+                        batch.map((mail, index) =>
+                            new Promise(resolve => setTimeout(async () => {
+                                await senderEmail(order, {
+                                    id: mail.id,
+                                    mail: mail.email,
+                                    config: mail.config
+                                });
+                                resolve();
+                            }, index * 20))
+                        )
                     );
-                    break
+                    await sleep(1);
                 }
-                // Gửi bắt đầu gửi email 
-                for (let index = 0; index < emails.length; index++) {
-                    // gửi từng email 1
-                    let mail = emails[index]
-                    await senderEmail(order, {
-                        id: mail.id,
-                        mail: mail.email,
-                        config: mail.config
-                    })
-                }
-                await sleep(30)
             }
-
-
-
-
-            try { OrderManeger.delete(order.id); } catch (error) { }
+            OrderManeger.delete(order.id);
         }
-        // sau kho ok thì xóa id ra khởi OrderManeger
-
-        await sleep(10);
+        await sleep(100);
     }
 };
-
-
-// let smtps = await Smtps.findAll({
-//     where: { status: 1 }
-// });
-
-// if (smtps.length === 0) {
-//     console.log("Không có SMTP nào khả dụng.");
-//     return;
-// }
-
-// let randomIndex = Math.floor(Math.random() * smtps.length);
-// const sender = new EmailSender(
-//     smtps[randomIndex].email,
-//     smtps[randomIndex].password.split(' ').join('')
-// );
-
-// await senderEmail(sender, orderProccess);
-
-
 
 // Số giây 10s
 const processSmtp = async () => {
