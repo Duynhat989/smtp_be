@@ -80,17 +80,16 @@ class SmtpManager {
     }
 
     async getSmtp() {
-        await this.loadSmtps();
-        if (this.smtps.length === 0) {
-            console.log("Remaining SMTPs 1: ", this.smtps.length);
-            return null; // Không có SMTP nào để sử dụng
-        }
-        const smtpData = this.smtps.shift();
-        console.log("Remaining SMTPs: ", this.smtps.length);
-        // this.updateStatus(smtpData.email);
-        return smtpData;
         try {
-
+            await this.loadSmtps();
+            if (this.smtps.length === 0) {
+                console.log("Remaining SMTPs 1: ", this.smtps.length);
+                return null; // Không có SMTP nào để sử dụng
+            }
+            const smtpData = this.smtps.shift();
+            console.log("Remaining SMTPs: ", this.smtps.length);
+            // this.updateStatus(smtpData.email);
+            return smtpData;
         } catch (error) {
             console.error('Error getting SMTP:', error);
             return null;

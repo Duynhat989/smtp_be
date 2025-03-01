@@ -22,7 +22,8 @@ const { authRoutes,
     userRoutes,
     setupRoutes,
     smtpRoutes,
-    scheduleRoutes
+    scheduleRoutes,
+    trackRoutes
 } = require('./app/routes');
 const { Mailer } = require('./app/nodemailer')
 app.use('/api/auth', authRoutes);
@@ -30,6 +31,7 @@ app.use("/api", userRoutes);
 app.use("/api", setupRoutes);
 app.use("/api", smtpRoutes);
 app.use("/api", scheduleRoutes);
+app.use("/api", trackRoutes);
 
 const { processSmtp } = require('./progress/index')
 processSmtp()

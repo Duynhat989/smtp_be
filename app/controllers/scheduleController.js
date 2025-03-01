@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize')
-const { STATUS, loadApiKey, Schedules, Emails } = require("../models");
+const { STATUS, loadApiKey, Schedules, Emails, User } = require("../models");
 
 // Lấy danh sách tất cả học sinh
 exports.create = async (req, res) => {
@@ -7,6 +7,27 @@ exports.create = async (req, res) => {
     try {
         const { name, timezone, telegramBot, startDate, endDate, emailLst, templateHTML,business,subject } = req.body
         const userId = req.user.id
+        // Gói email 
+        const user = await User.findByPk(userId)
+        if(!user){
+            res.status(500).json({
+                success: false,
+                error: "Not login"
+            });
+            return
+        }
+        // Check balance
+        let balance = user.balance
+        if(balance == 0 || emailLst.length > balance){
+            res.status(500).json({
+                success: false,
+                error: "No balance account"
+            });
+            return
+        }else{
+            balance = balance - emailLst.length
+            await User.update({ balance: balance }, { where: { id: userId } });
+        }
         let result = await Schedules.create({
             name,
             timezone,
@@ -74,7 +95,8 @@ exports.list = async (req, res) => {
                 as: "emails",
                 attributes: [
                     [Sequelize.fn("COUNT", Sequelize.col("emails.id")), "emailCount"], // Tổng số email
-                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 2 THEN 1 END`)), "send"] // Số email đã gửi
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 2 THEN 1 END`)), "send"], // Số email đã gửi
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 3 THEN 2 END`)), "spam"] // Số email vào spam
                 ],
                 required: false // 🟡 Tránh mất Schedules không có email nào
             }

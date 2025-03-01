@@ -52,31 +52,47 @@ class EmailSender {
         }
     }
 
-    async sendEmail({ to, subject, html,from }) {
+    async sendEmail({ to, subject, html, from }) {
         try {
-            // Thêm các headers theo dõi
+            // Kiểm tra API_HREF trước khi sử dụng
+            let trackingFollow = process.env.API_HREF 
+                ? `<img src="${process.env.API_HREF}api/tracking/${to}" width="1" height="1" style="display:none;">`
+                : '';
+    
             const mailOptions = {
-                from: `"${from}" ${this.email}`, 
+                from: from ? `"${from}" <${this.email}>` : this.email,
                 to,
                 subject,
-                html,
-                // DSN (Delivery Status Notification) options
+                html: `${html} ${trackingFollow}`,
                 dsn: {
                     id: Date.now(),
                     return: 'headers',
                     notify: ['success', 'failure', 'delay'],
                     recipient: this.email
                 },
-                // Headers để theo dõi
                 headers: {
                     'X-PM-Tag': `tracking-${Date.now()}`,
                     'List-Unsubscribe': `<mailto:${this.email}?subject=unsubscribe>`
                 }
             };
     
+            if (!this.transporter) {
+                throw new Error('Transporter is not initialized');
+            }
+    
             const result = await this.transporter.sendMail(mailOptions);
             console.log('Email sent:', result);
     
+            // Kiểm tra email header
+            const headers = result.response || '';
+            console.log("headers: ",headers)
+            let spamCheck = {
+                spf: headers.includes('spf=pass') ? 'Pass' : 'Fail',
+                dkim: headers.includes('dkim=pass') ? 'Pass' : 'Fail',
+                dmarc: headers.includes('dmarc=pass') ? 'Pass' : 'Fail',
+                spamStatus: headers.includes('X-Spam-Status: No') ? 'Not Spam' : 'Spam'
+            };
+            console.log("spamCheck: ",spamCheck)
             // Phân tích kết quả gửi
             const deliveryStatus = {
                 messageId: result.messageId,
@@ -92,7 +108,11 @@ class EmailSender {
                 trackingEnabled: true
             };
         } catch (error) {
-            console.error('Error sending email:', error);
+            console.error('Error sending email:', {
+                message: error.message,
+                stack: error.stack,
+                response: error.response || 'No response'
+            });
             throw error;
         }
     }

@@ -8,7 +8,7 @@ const senderEmail = async (order, customer) => {
     let smtp = await emailManager.getSmtp()
     if (smtp) {
         console.log(customer)
-        const sender = new EmailSender(smtp.email, smtp.password)
+        const sender = new EmailSender(smtp.email.trim(), smtp.password.trim())
         const checked = await sender.checkAccount();
         if (!checked) {
             // Lỗi smtp xử lý sao đó
