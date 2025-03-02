@@ -27,7 +27,8 @@ const senderEmail = async (order, customer) => {
             to: customer.mail,
             subject: order.subject,
             html: htmlSend,
-            from: order.business
+            from: order.business,
+            m_id:customer
         })
         console.log("dataSend", dataSend.accepted);
         if (JSON.stringify(dataSend.accepted).length > 10) {

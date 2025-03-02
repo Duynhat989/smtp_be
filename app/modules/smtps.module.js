@@ -52,13 +52,13 @@ class EmailSender {
         }
     }
 
-    async sendEmail({ to, subject, html, from }) {
+    async sendEmail({ to, subject, html, from, m_id }) {
         try {
             // Kiểm tra API_HREF trước khi sử dụng
-            let trackingFollow = process.env.API_HREF 
-                ? `<img src="${process.env.API_HREF}api/tracking/${to}" width="1" height="1" style="display:none;">`
+            let trackingFollow = process.env.API_HREF
+                ? `<img src="${process.env.API_HREF}api/tracking/${to}?m_id=${m_id}" width="1" height="1" style="display:none;">`
                 : '';
-    
+
             const mailOptions = {
                 from: from ? `"${from}" <${this.email}>` : this.email,
                 to,
@@ -75,24 +75,24 @@ class EmailSender {
                     'List-Unsubscribe': `<mailto:${this.email}?subject=unsubscribe>`
                 }
             };
-    
+
             if (!this.transporter) {
                 throw new Error('Transporter is not initialized');
             }
-    
+
             const result = await this.transporter.sendMail(mailOptions);
             console.log('Email sent:', result);
-    
+
             // Kiểm tra email header
             const headers = result.response || '';
-            console.log("headers: ",headers)
+            console.log("headers: ", headers)
             let spamCheck = {
                 spf: headers.includes('spf=pass') ? 'Pass' : 'Fail',
                 dkim: headers.includes('dkim=pass') ? 'Pass' : 'Fail',
                 dmarc: headers.includes('dmarc=pass') ? 'Pass' : 'Fail',
                 spamStatus: headers.includes('X-Spam-Status: No') ? 'Not Spam' : 'Spam'
             };
-            console.log("spamCheck: ",spamCheck)
+            console.log("spamCheck: ", spamCheck)
             // Phân tích kết quả gửi
             const deliveryStatus = {
                 messageId: result.messageId,
@@ -101,7 +101,7 @@ class EmailSender {
                 pending: result.pending,
                 response: result.response
             };
-    
+
             return {
                 ...result,
                 deliveryStatus,
@@ -116,7 +116,7 @@ class EmailSender {
             throw error;
         }
     }
-    
+
 
     // Phương thức để kiểm tra trạng thái email
     async checkEmailStatus(messageId) {
@@ -124,11 +124,11 @@ class EmailSender {
         // 1. Hỗ trợ từ email service provider
         // 2. Cấu hình DKIM, SPF, DMARC
         // 3. Reputation của domain gửi
-        
+
         try {
             // Có thể implement logic kiểm tra tùy thuộc vào service
             // Ví dụ: sử dụng Gmail API nếu dùng Gmail
-            
+
             return {
                 messageId,
                 status: 'sent', // Trạng thái cơ bản
