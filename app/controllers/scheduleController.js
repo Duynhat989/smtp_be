@@ -94,9 +94,10 @@ exports.list = async (req, res) => {
                 model: Emails,
                 as: "emails",
                 attributes: [
-                    [Sequelize.fn("COUNT", Sequelize.col("emails.id")), "emailCount"], // Tổng số email
-                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 2 THEN 1 END`)), "send"], // Số email đã gửi
-                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status = 3 THEN 2 END`)), "spam"] // Số email vào spam
+                    [Sequelize.fn("COUNT", Sequelize.col("emails.id")), "emailCount"], // Tổng số email có theo ID của Schedules
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status >= 2 THEN 1 END`)), "send"], // Số email đã gửi (status >= 2)
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status >= 3 THEN 1 END`)), "opened"], // Số email đã mở (status >= 3)
+                    [Sequelize.fn("COUNT", Sequelize.literal(`CASE WHEN emails.status >= 4 THEN 1 END`)), "clicked"] // Số email đã click (status >= 4)
                 ],
                 required: false // 🟡 Tránh mất Schedules không có email nào
             }
