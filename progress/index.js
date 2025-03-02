@@ -30,7 +30,7 @@ const senderEmail = async (order, customer) => {
             from: order.business,
             m_id: customer.id
         })
-        console.log("dataSend", dataSend.accepted);
+        // console.log("dataSend", dataSend.accepted);
         if (JSON.stringify(dataSend.accepted).length > 10) {
             console.log('Vào inbox')
             await Emails.update(
@@ -86,7 +86,7 @@ const getIdOrder = async () => {
 };
 const processSmtpWorker = async (thead) => {
     while (true) {
-        console.log(`Worker: ${thead}`, OrderManeger);
+        // console.log(`Worker: ${thead}`, OrderManeger);
         let order = await getIdOrder();
         if (order) {
             while (true) {
