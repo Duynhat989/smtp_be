@@ -4,8 +4,8 @@ const { Emails } = require("../models"); // Giả sử model Smtps được đ�
 exports.tracking = async (req, res) => {
     const { id } = req.params; // Lấy id từ url là tracking
     const { m_id } = req.query; // Lấy id từ url là tracking
-    const clientIp = req.ip || "NoIP";
     const userAgent = req.headers["user-agent"];
+    const clientIp = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     const referer = req.headers["referer"] || "Direct Access";
     const openedAt = new Date();
 
@@ -13,6 +13,7 @@ exports.tracking = async (req, res) => {
         console.log("tracking:", id);
         console.log("m_id:", m_id);
         console.log("IP:", clientIp);
+
         console.log("User-Agent:", userAgent);
         console.log("Referer:", referer);
         console.log("Opened At:", openedAt);
