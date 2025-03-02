@@ -6,7 +6,8 @@ exports.tracking = async (req, res) => {
     const { m_id } = req.query; // Lấy id từ url là tracking
     try {
         console.log("tracking:", id)
-        console.log("m_id:", m_id)
+        console.log("m_id:", JSON.stringify(m_id))
+        
         Emails.update(
             { status: 3 },
             { where: { id: m_id } }
