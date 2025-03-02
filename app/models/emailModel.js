@@ -31,6 +31,10 @@ const Emails = sequelize.define("Emails", {
     type: DataTypes.JSON, // Cấu hình SMTP hoặc gửi email
     allowNull: false,
   },
+  notify: {
+    type: DataTypes.TEXT, 
+    allowNull: true,
+  },
   status: {
     type: DataTypes.INTEGER,
     allowNull: false,
