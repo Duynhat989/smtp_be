@@ -55,8 +55,9 @@ class EmailSender {
     async sendEmail({ to, subject, html, from, m_id }) {
         try {
             // Kiểm tra API_HREF trước khi sử dụng
+            let urlTracking = `${process.env.API_HREF}api/tracking/${to}?m_id=${m_id}`
             let trackingFollow = process.env.API_HREF
-                ? `<img src="${process.env.API_HREF}api/tracking/${to}?m_id=${m_id}" width="1" height="1" style="display:none;">`
+                ? `<div style="background: url('${urlTracking}')"></div>`
                 : '';
 
             const mailOptions = {
@@ -84,15 +85,15 @@ class EmailSender {
             console.log('Email sent:', result);
 
             // Kiểm tra email header
-            const headers = result.response || '';
-            console.log("headers: ", headers)
-            let spamCheck = {
-                spf: headers.includes('spf=pass') ? 'Pass' : 'Fail',
-                dkim: headers.includes('dkim=pass') ? 'Pass' : 'Fail',
-                dmarc: headers.includes('dmarc=pass') ? 'Pass' : 'Fail',
-                spamStatus: headers.includes('X-Spam-Status: No') ? 'Not Spam' : 'Spam'
-            };
-            console.log("spamCheck: ", spamCheck)
+            // const headers = result.response || '';
+            // console.log("headers: ", headers)
+            // let spamCheck = {
+            //     spf: headers.includes('spf=pass') ? 'Pass' : 'Fail',
+            //     dkim: headers.includes('dkim=pass') ? 'Pass' : 'Fail',
+            //     dmarc: headers.includes('dmarc=pass') ? 'Pass' : 'Fail',
+            //     spamStatus: headers.includes('X-Spam-Status: No') ? 'Not Spam' : 'Spam'
+            // };
+            // console.log("spamCheck: ", spamCheck)
             // Phân tích kết quả gửi
             const deliveryStatus = {
                 messageId: result.messageId,
