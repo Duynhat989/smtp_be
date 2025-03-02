@@ -4,7 +4,7 @@ const { Emails } = require("../models"); // Giả sử model Smtps được đ�
 exports.tracking = async (req, res) => {
     const { id } = req.params; // Lấy id từ url là tracking
     const { m_id } = req.query; // Lấy id từ url là tracking
-    const clientIp = req.ip || "NoIP"; 
+    const clientIp = req.ip || "NoIP";
     const userAgent = req.headers["user-agent"];
     const referer = req.headers["referer"] || "Direct Access";
     const openedAt = new Date();
@@ -18,7 +18,12 @@ exports.tracking = async (req, res) => {
         console.log("Opened At:", openedAt);
 
         await Emails.update(
-            { status: 3, openedAt, clientIp, userAgent, referer },
+            {
+                status: 3,
+                notify: JSON.stringify({
+                    openedAt, clientIp, userAgent, referer
+                })
+            },
             { where: { id: m_id } }
         );
 
